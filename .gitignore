@@ -35,5 +35,5 @@
 # Config files
 .vscode/
 
-# SDL2 Lib files
-src/
+# Rest
+*.png

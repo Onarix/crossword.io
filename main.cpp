@@ -1,56 +1,43 @@
-#include "SDL_SETUP.hpp"
+#include <iostream>
+
 #include "table.hpp"
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 1080
+#define SCREEN_HEIGHT 720
 
-// THIS IS A VERY FIRST, TEMPORARY VERSION OF THE PROJECT!
-// TODO: class for every tile, that will consist of SDL_Rect shape and char inside it
+// Background
+#define WHITE sf::Color(255, 255, 255)
 
-int main(int argc, char** argv) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("Error: SDL failed to initialize\nSDL Error: '%s'\n", SDL_GetError());
-        return 1;
-    }
+// THIS IS A VERY ALPHA VERSION OF THE PROJECT!
 
-    SDL_Window* window = SDL_CreateWindow("crossword.io", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-    if (!window) {
-        printf("Error: Failed to open window\nSDL Error: '%s'\n", SDL_GetError());
-        return 1;
-    }
+int main() {
+    // Window
+    sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "crossword.io");
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (!renderer) {
-        printf("Error: Failed to create renderer\nSDL Error: '%s'\n", SDL_GetError());
-        return 1;
-    }
+    // Text
+    sf::Font font;
+    if (!font.loadFromFile("data/font.ttf"))
+        return EXIT_FAILURE;
+    sf::Text title("crossword.io", font, 24);
+    title.setFillColor(sf::Color(0, 0, 0, 255));
+    title.setPosition(40.f, 20.f);
 
-    Table tab(5, 5, renderer);
+    // Table
+    Table table(5, 5, font);
 
-    bool running = true;
-    bool game = false;
-    while (running) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
-                    running = false;
-                    break;
-                case SDL_KEYDOWN:
-                    game = true;
-                default:
-                    break;
-            }
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
         }
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
-
-        if (game)
-            tab.draw(renderer, 5, 5);
-
-        SDL_RenderPresent(renderer);
+        // RENDER
+        window.clear(WHITE);
+        window.draw(title);
+        window.draw(table);
+        window.display();
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
