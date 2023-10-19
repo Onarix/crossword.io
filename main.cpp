@@ -1,9 +1,11 @@
 #include <iostream>
 
-#include "table.hpp"
+#include "Table.hpp"
 
-#define SCREEN_WIDTH 1080
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
+#define HORIZONTAL false
+#define VERTICAL true
 
 // Background
 #define WHITE sf::Color(255, 255, 255)
@@ -23,7 +25,7 @@ int main() {
     title.setPosition(40.f, 20.f);
 
     // Table
-    Table table(5, 5, font);
+    Table table(10, 10, font);
 
     while (window.isOpen()) {
         sf::Event event;
