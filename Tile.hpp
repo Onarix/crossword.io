@@ -25,6 +25,7 @@ class Tile : public sf::Drawable {
     sf::Text getLetter();
     float getSize();
     void setLetterFont(sf::Font& font);
+    void setLetter(char txt);
     void setPosition(float x, float y);
 };
 
@@ -75,6 +76,13 @@ inline float Tile::getSize() {
 /// @param font Reference to the font of program  
 inline void Tile::setLetterFont(sf::Font& font) {
     this->letter.setFont(font);
+}
+
+/// @brief Set letter in Tile
+/// @param txt letter to be set
+inline void Tile::setLetter(char txt) {
+    std::string s(1, txt);
+    this->letter.setString(s);
 }
 
 /// @brief Sets the position of Tile
