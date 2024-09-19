@@ -2,17 +2,13 @@
 #define WORDS_GENERATOR_H
 
 #include <algorithm>
-#include <fstream>
+#include <sqlite3.h>
 #include <iostream>
 #include <random>
 #include <vector>
 
-// NOTE: Let's leave MySQL for a while, temporarily working just o na plain .txt file
 
-/*#include "C:/Program Files/MySQL/MySQL Server 8.0/include/mysql.h"  // Path to mySQL lib
-#include "C:/Program Files/MySQL/Connector C++ 8.0/include/mysqlx/xapi.h"*/
-
-char alphabet[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+const char alphabet[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
 class WordsGenerator {
    private:
@@ -22,7 +18,7 @@ class WordsGenerator {
     std::uniform_int_distribution<int> letters;
     std::vector<std::string> words;
     std::vector<int> used;
-    std::fstream wordDB;
+
 
    public:
     WordsGenerator(int tab_size);
@@ -34,18 +30,34 @@ class WordsGenerator {
 
 /// @brief WordsGenerator class constructor
 WordsGenerator::WordsGenerator(int tab_size) : dist(0, 999), points(0, tab_size), letters(0, 25) {
-    wordDB.open("data/words.txt", std::ios::in);
-    if (!(wordDB)) {
-        std::cerr << "The file containing words doesn't exist!\n";
+    sqlite3_stmt *statement;
+    sqlite3* wordDB;
+    int return_code;
+
+
+    return_code = sqlite3_open("data/words.db", &wordDB);
+    if (return_code != SQLITE_OK) {
+        std::cerr << "The database file containing words doesn't exist!\n";
     }
 
-    std::string temp = std::string();
-    while (!(wordDB.eof())) {
-        wordDB >> temp;
-        words.push_back(temp);
+    const char *sql = "SELECT word FROM WORDS;";
+    return_code = sqlite3_prepare_v2(wordDB, sql, -1, &statement, nullptr);
+    if (return_code != SQLITE_OK) {
+        std::cerr << "Failed to execute query: " << sqlite3_errmsg(wordDB) << std::endl;
+        sqlite3_close(wordDB);
     }
 
-    wordDB.close();
+    while ((return_code = sqlite3_step(statement)) == SQLITE_ROW) {
+        const unsigned char *word = sqlite3_column_text(statement, 0);
+        words.push_back(std::string(reinterpret_cast<const char*>(word)));
+    }
+
+    if (return_code != SQLITE_DONE) {
+        std::cerr << "Error retrieving data: " << sqlite3_errmsg(wordDB) << std::endl;
+    }
+
+    sqlite3_finalize(statement);
+    sqlite3_close(wordDB);
 }
 
 /// @brief WordsGenerator class destructor

@@ -68,7 +68,7 @@ inline void Table::fillRestWithLetters() {
     WordsGenerator wordsGenerator(this->width);
     // TODO: Work with this function, it only generates random letters at first row
     for (int i = 0; i < this->width; i++) {
-        for (int j = 0; i < this->height; i++) {
+        for (int j = 0; j < this->height; j++) {
             if (!(tile[i][j].isOverwritten()))
                 tile[i][j].setLetter(wordsGenerator.getRandomLetter());
         }
