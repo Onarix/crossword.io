@@ -10,12 +10,16 @@
 #define HORIZONTAL false
 #define VERTICAL true
 
-#define TILE_SIZE 100  // width and height are the same - let's call them 'size'
+#define TILE_SIZE 60  // width and height are the same - let's call them 'size'
 #define TILE_THICKNESS 4.f
 #define LETTER_SIZE 40
+#define LETTER_HEIGHT_OFFSET 5.f
 
 // COLORS
 #define BLACK sf::Color(0, 0, 0)
+#define RED sf::Color(255, 0, 0)
+#define GREEN sf::Color(0, 255, 0)
+#define BLUE sf::Color(0, 0, 255)
 
 /// @brief Tile class
 class Tile : public sf::Drawable {
@@ -30,9 +34,11 @@ class Tile : public sf::Drawable {
     ~Tile();
     sf::RectangleShape getBody();
     sf::Text getLetter();
+    sf::Color const getLetterColor() const;
     float getSize();
     void setLetterFont(sf::Font& font);
     void setLetter(char txt);
+    void setLetterColor(const sf::Color& color);
     void setPosition(float x, float y);
     bool isOverwritten();
 };
@@ -75,6 +81,12 @@ inline sf::Text Tile::getLetter() {
     return letter;
 }
 
+
+/// @return Letter Color
+inline const sf::Color Tile::getLetterColor() const {
+    return this->letter.getFillColor();
+}
+
 /// @return Size of Tile
 inline float Tile::getSize() {
     return TILE_SIZE;
@@ -94,12 +106,19 @@ inline void Tile::setLetter(char txt) {
     this->overwriten = true;
 }
 
+
+/// @brief Sets letter color
+/// @param color letter color to be set
+inline void Tile::setLetterColor(const sf::Color& color) {
+    this->letter.setFillColor(color);
+}
+
 /// @brief Sets the position of Tile
 /// @param x x value of the position
 /// @param y y value of the position
 inline void Tile::setPosition(float x, float y) {
     this->Body.setPosition({x, y});
-    this->letter.setPosition({x + float(TILE_SIZE / 4), y + float(TILE_SIZE / 4)});
+    this->letter.setPosition({x + float(TILE_SIZE / 4), y + float(TILE_SIZE / 4) - LETTER_HEIGHT_OFFSET});
 }
 
 /// @brief Check whether tile is overwritten by letter

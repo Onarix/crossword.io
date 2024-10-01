@@ -46,18 +46,47 @@ inline bool Table::insertWord(std::string word, bool orientation, sf::Vector2<in
         if (word.length() > (this->width - start_point.x))
             return false;
 
-        for (int i = start_point.x; i < word.length(); i++) {
-            tile[i][start_point.y].setLetter(word[i]);
+        std::cout << "Word length checked\n";
+
+        for (int i = start_point.x; i < start_point.x + word.length(); i++) {
+            if(tile[i][start_point.y].isOverwritten())
+                return false;
         }
+
+        std::cout << "Space checked\n";
+
+
+        for (int i = start_point.x; i < start_point.x + word.length(); i++) {
+            tile[i][start_point.y].setLetter(word[i - start_point.x]);
+        }
+
+        std::cout << "Word set checked\n";
+    
         return true;
 
     } else if (orientation == VERTICAL) {
         if (word.length() > (this->height - start_point.y))
             return false;
 
-        for (int i = start_point.y; i < word.length(); i++) {
-            tile[start_point.x][i].setLetter(word[i]);
+        std::cout << "Word length checked\n";
+
+
+        for (int i = start_point.y; i < start_point.y + word.length(); i++) {
+            if(tile[start_point.x][i].isOverwritten()) {
+                if(word[i - start_point.y] == tile[start_point.x][i].getLetter().getString()[0])
+                    continue;
+                return false;
+            }
         }
+
+        std::cout << "Space checked\n";
+
+        for (int i = start_point.y; i < start_point.y + word.length(); i++) {
+            tile[start_point.x][i].setLetter(word[i - start_point.y]);
+        }
+
+        std::cout << "Word set checked\n";
+
         return true;
     } else
         return false;
@@ -66,11 +95,12 @@ inline bool Table::insertWord(std::string word, bool orientation, sf::Vector2<in
 /// @brief Fills rest of the table with random letters
 inline void Table::fillRestWithLetters() {
     WordsGenerator wordsGenerator(this->width);
-    // TODO: Work with this function, it only generates random letters at first row
+
     for (int i = 0; i < this->width; i++) {
         for (int j = 0; j < this->height; j++) {
-            if (!(tile[i][j].isOverwritten()))
+            if (!(tile[i][j].isOverwritten())) {
                 tile[i][j].setLetter(wordsGenerator.getRandomLetter());
+            }
         }
     }
 }
@@ -97,10 +127,35 @@ inline Table::Table(int _width, int _height, sf::Font& _font) : width(_width), h
     // WordGenerator Test
     // TODO: a fully working generating system
     WordsGenerator wordsGenerator(this->width);
+    int tries = 0;
     bool success = false;
-    do {
-        success = this->insertWord(wordsGenerator.getRandomWord(), HORIZONTAL, wordsGenerator.getRandomPoint());
-    } while (!(success));
+    std::string word = "";
+    sf::Vector2i point;
+
+   std::cout << "HORIZONTAL\n";
+
+   for(int i = 0; i < this->width / 4; i++) {
+        word = wordsGenerator.getRandomWord();
+        point = wordsGenerator.getRandomPoint(this->width - word.length(), HORIZONTAL);
+        
+        do {
+            std::cout << ++tries << "try  - " << word << " ( " << point.x << "," << point.y << " )" << "\n";
+            success = this->insertWord(word, HORIZONTAL, point);
+            point.y = (point.y + 1) % this->width;
+        } while (!(success));
+   }
+
+    std::cout << "VERTICAL\n";
+   for(int i = 0; i < this->width / 4; i++) {
+            word = wordsGenerator.getRandomWord();
+            point = wordsGenerator.getRandomPoint(this->height - word.length(), VERTICAL);
+
+        do {
+            std::cout << ++tries << "try  - " << word << " ( " << point.x << "," << point.y << " )" << "\n";
+            success = this->insertWord(word, VERTICAL, point);
+            point.x = (point.x + 1) % this->width;
+        } while (!(success));
+   }
 
     this->fillRestWithLetters();
 }

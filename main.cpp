@@ -5,6 +5,9 @@
 // Background
 #define WHITE sf::Color(255, 255, 255)
 
+// Table size
+#define SIZE 14
+
 // THIS IS A VERY ALPHA VERSION OF THE PROJECT!
 
 int main() {
@@ -20,7 +23,7 @@ int main() {
     title.setPosition(40.f, 20.f);
 
     // Table
-    Table table(5, 5, font);
+    Table table(SIZE, SIZE, font);
 
     while (window.isOpen()) {
         sf::Event event;
