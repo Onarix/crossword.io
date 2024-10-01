@@ -7,6 +7,8 @@
 #include <random>
 #include <vector>
 
+#define HORIZONTAL false
+#define VERTICAL true
 
 const char alphabet[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
@@ -24,12 +26,12 @@ class WordsGenerator {
     WordsGenerator(int tab_size);
     ~WordsGenerator();
     std::string getRandomWord();
-    sf::Vector2<int> getRandomPoint();
+    sf::Vector2<int> getRandomPoint(int seed, bool orientation);
     char getRandomLetter();
 };
 
 /// @brief WordsGenerator class constructor
-WordsGenerator::WordsGenerator(int tab_size) : dist(0, 999), points(0, tab_size), letters(0, 25) {
+WordsGenerator::WordsGenerator(int tab_size) : dist(0, 999), points(0, tab_size - 1), letters(0, 25) {
     sqlite3_stmt *statement;
     sqlite3* wordDB;
     int return_code;
@@ -79,8 +81,23 @@ inline std::string WordsGenerator::getRandomWord() {
 
 /// @brief Get random point in game table
 /// @return random sf::Vector2 point
-inline sf::Vector2<int> WordsGenerator::getRandomPoint() {
-    return {points(rd), points(rd)};
+inline sf::Vector2<int> WordsGenerator::getRandomPoint(int seed = -1, bool orientation = HORIZONTAL) {
+    if (seed == -1)
+        return {points(rd), points(rd)};
+    else {
+        if(orientation == HORIZONTAL) {
+            std::cout << "seed: " << seed << std::endl;
+            std::uniform_int_distribution<int> offset(0, seed);
+            return {offset(rd), points(rd)};
+        }
+        else if(orientation == VERTICAL) {
+            std::cout << "seed: " << seed << std::endl;
+            std::uniform_int_distribution<int> offset(0, seed);
+            return {points(rd), offset(rd)};
+        }
+        else
+            return {points(rd), points(rd)};
+    }
 }
 
 /// @brief Get Random letter from hardcoded alphabet
