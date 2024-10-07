@@ -19,7 +19,7 @@
 #define BLACK sf::Color(0, 0, 0)
 #define RED sf::Color(255, 0, 0)
 #define GREEN sf::Color(0, 255, 0)
-#define BLUE sf::Color(0, 0, 255)
+#define BLUE sf::Color(0, 255, 255)
 
 /// @brief Tile class
 class Tile : public sf::Drawable {

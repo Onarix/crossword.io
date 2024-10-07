@@ -13,6 +13,8 @@ class Table : public sf::Drawable {
     // Width and height are measured in tiles (ex. xWidth = 5 means 5 tiles width)
     int width = 0;
     int height = 0;
+    sf::Vector2f start_point = {0, 0}; // top-left point of table
+    sf::Vector2f end_point = {0, 0}; // bottom-right point of table
     Tile** tile = nullptr;
     sf::Font& font;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -22,6 +24,10 @@ class Table : public sf::Drawable {
    public:
     Table(int _width, int _height, sf::Font& _font);
     ~Table();
+    Tile getTile(int x, int y);
+    void setTileLetterColor(const sf::Color& color, int tile_x, int tile_y);
+    sf::Vector2f getStartPoint();
+    sf::Vector2f getEndPoint();
 };
 
 /// @brief Draws Table Object
@@ -116,11 +122,14 @@ inline Table::Table(int _width, int _height, sf::Font& _font) : width(_width), h
     }
     std::cout << "Table initialized!\n";
 
+    start_point.x = (SCREEN_WIDTH / 2) - ((TILE_SIZE * this->width) / 2);
+    start_point.y = (SCREEN_HEIGHT / 2) - ((TILE_SIZE * this->height) / 2);
+    end_point.x = start_point.x + (TILE_SIZE * this->width);
+    end_point.y = start_point.y + (TILE_SIZE * this->height);
+
     for (int i = 0; i < this->width; i++) {
         for (int j = 0; j < this->height; j++) {
-            float x_start = (SCREEN_WIDTH / 2) - ((TILE_SIZE * this->width) / 2);
-            float y_start = (SCREEN_HEIGHT / 2) - ((TILE_SIZE * this->height) / 2);
-            tile[i][j].setPosition(x_start + tile[i][j].getSize() * i, y_start + tile[i][j].getSize() * j);
+            tile[i][j].setPosition(start_point.x + tile[i][j].getSize() * i, start_point.y + tile[i][j].getSize() * j);
         }
     }
 
@@ -167,6 +176,34 @@ inline Table::~Table() {
     }
     delete[] tile;
     std::cout << "Table destroyed!\n";
+}
+
+/// @brief Returns tile object on (x,y) position
+/// @param x horizontal position of tile
+/// @param y vertical position of tile
+/// @return tile object
+inline Tile Table::getTile(int x, int y) {
+    return this->tile[x][y];
+}
+
+/// @brief Sets letter color of tile with specified coordinates 
+/// @param color Color to be set
+/// @param tile_x X-pos of tile
+/// @param tile_y Y-pos of tile
+inline void Table::setTileLetterColor(const sf::Color& color, int tile_x, int tile_y) {
+    tile[tile_x][tile_y].setLetterColor(color);
+}
+
+/// @brief Returns starting point (left-top) of the table
+/// @return start_point
+inline sf::Vector2f Table::getStartPoint() {
+    return this->start_point;
+}
+
+/// @brief Returns ending point (right-bottom) of the table
+/// @return end_point
+inline sf::Vector2f Table::getEndPoint() {
+    return this->end_point;
 }
 
 #endif
